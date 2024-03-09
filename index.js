@@ -16,7 +16,7 @@ const User = require('./models/user');
 const Product = require('./models/product');
 const Post = require('./models/post');
 const Order = require('./models/order');
-const Order_items = require('./models/order-items');
+const Order_items = require('./models/order-item');
 const Course = require('./models/course');
 
 
@@ -28,6 +28,8 @@ const womensRouter = require('./routes/womens');
 const usersRouter = require('./routes/users');
 const postsRouter = require('./routes/posts');
 const productsRouter = require('./routes/products');
+const coursesRouter = require('./routes/courses');
+const ordersRouter = require('./routes/orders');
 
 
 //MIDDLEWARE
@@ -42,6 +44,8 @@ app.use(`${api}/womens`, womensRouter);
 app.use(`${api}/users`, usersRouter);
 app.use(`${api}/posts`, postsRouter);
 app.use(`${api}/products`, productsRouter);
+app.use(`${api}/courses`, coursesRouter)
+app.use(`${api}/orders`, ordersRouter)
 
 
 
