@@ -1,35 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const {Post} = require('../models/post');
-const multer = require('multer');
-const { FILE } = require("dns");
-
-const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
-
-}
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('Invalid Image type')
-        if(isValid){
-            uploadError = null
-        }
-
-      cb(uploadError, 'public/uploads')
-    },
-    filename: function (req, file, cb) {
-        
-    const filename = file.originalname.split(' ').join('-');
-    const extension = FILE_TYPE_MAP[file.mimetype];
-    cb(null, `${filename}-${Date.now()}.${extension}`)
-    }
-  })
-  
-  const uploadOptions = multer({ storage: storage })
-
 
 router.get(`/`, async (req, res)=>{
     const postList = await Order.find().populate('user', 'name').sort({'dateOrdered': -1});
@@ -60,12 +31,10 @@ router.get(`/:_id`, async (req, res)=>{
 })
 
 router.post('/', async (req, res)=>{
-    const fileName  = req.file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
     const post = new Post({
         title: req.body.title,
         description: req.body.description,
-        image: `${basePath}${fileName}`,
+        image: req.body.image,
     })
     await post.save();
     try{
