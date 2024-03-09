@@ -13,6 +13,10 @@ const postSchema = mongoose.Schema({
         type: String,
         default: ''
     },
+    dateCreated: {
+        type: Date,
+        default: Date.now
+    },
 
 })
 postSchema.virtual('id').get(function (){

@@ -18,7 +18,6 @@ const Post = require('./models/post');
 const Order = require('./models/order');
 const Order_items = require('./models/order-items');
 const Course = require('./models/course');
-const Course_category = require('./models/course_category');
 
 
 //GENERAL
@@ -27,6 +26,9 @@ app.use(cors());
 const api = process.env.API_URL;
 const womensRouter = require('./routes/womens');
 const usersRouter = require('./routes/users');
+const postsRouter = require('./routes/posts');
+const productsRouter = require('./routes/products');
+
 
 //MIDDLEWARE
 app.use(express.json());
@@ -36,8 +38,11 @@ app.use(errorHandler);
 app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 
 //ROUTERS
-app.use(`${api}/womens`, womensRouter)
-app.use(`${api}/users`, usersRouter)
+app.use(`${api}/womens`, womensRouter);
+app.use(`${api}/users`, usersRouter);
+app.use(`${api}/posts`, postsRouter);
+app.use(`${api}/products`, productsRouter);
+
 
 
 const db_url = process.env.db_url;

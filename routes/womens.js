@@ -2,7 +2,35 @@ const express = require('express');
 const bcrypt = require('bcryptjs')
 const router = express.Router();
 const {Women} = require('../models/women');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const { FILE } = require("dns");
+
+const FILE_TYPE_MAP = {
+    'image/png': 'png',
+    'image/jpeg': 'jpeg',
+    'image/jpg': 'jpg'
+
+}
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const isValid = FILE_TYPE_MAP[file.mimetype];
+        let uploadError = new Error('Invalid Image type')
+        if(isValid){
+            uploadError = null
+        }
+
+      cb(uploadError, 'public/uploads')
+    },
+    filename: function (req, file, cb) {
+        
+    const filename = file.originalname.split(' ').join('-');
+    const extension = FILE_TYPE_MAP[file.mimetype];
+    cb(null, `${filename}-${Date.now()}.${extension}`)
+    }
+  })
+  
+  const uploadOptions = multer({ storage: storage })
 
 router.get('/', async (req,res)=>{
     const WomenList = await Women.find().select('-passwordHash');
@@ -30,6 +58,8 @@ router.get(`/:_id`, async (req, res) =>{
 
 router.post('/', async (req, res)=>{
     const salt = await bcrypt.genSalt();
+    const fileName  = req.file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
     const women = new Women({
         name: req.body.name,
         email: req.body.email,
@@ -84,6 +114,8 @@ router.post('/login', async (req, res)=>{
 //Register
 router.post('/register', async (req, res)=>{
     const salt = await bcrypt.genSalt();
+    const fileName  = req.file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
     const women = new women({
         name: req.body.name,
         email: req.body.email,
@@ -133,6 +165,8 @@ router.delete('/:_id', async (req,res)=>{
 router.put('/:_id', async (req, res)=>{
     const salt = await bcrypt.genSalt();
     const womenExist = await Women.findById(req.params.id);
+    const fileName  = req.file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
     let newPassword
     if(req.body.password){
         newPassword = bcrypt.hashSync(req.body.password, salt)
