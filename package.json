@@ -1,0 +1,25 @@
+{
+  "name": "womentechies2024_backend",
+  "version": "1.0.0",
+  "description": "backend for womentechies 2024",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ansu Banerjee",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ansubanerjee/womentechies2024_backend"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-jwt": "^8.4.1",
+    "mongoose": "^8.2.1",
+    "nodemon": "^3.1.0"
+  }
+}
