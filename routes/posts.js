@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {Post} = require('../models/post');
 const multer = require('multer');
+
 const FILE_TYPE_MAP = {
     'upload/png' : 'png',
     'upload/jpg' : 'jpg',

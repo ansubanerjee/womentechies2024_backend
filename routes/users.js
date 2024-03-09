@@ -204,7 +204,7 @@ router.put('/:_id', uploadOptions.single('image'), async (req, res)=>{
         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/profile_pics`;
         imagepath =  `${basePath}${fileName}`
     }else{
-        imagepath = user.image;
+        imagepath = userExist.image;
     }
     const salt = await bcrypt.genSalt();
     let newPassword
@@ -233,69 +233,6 @@ router.put('/:_id', uploadOptions.single('image'), async (req, res)=>{
             res.status(400).json({success: false, message: "User was not found"});
         }
         res.status(200).send(updatedUser);
-
-})
-
-router.put('/:_id', async (req, res)=>{
-    const userExist = await User.findById(req.params.id);
-    const salt = await bcrypt.genSalt();
-    //through ID check type: if type is naari show naari page, else show user
-    let newPassword
-    if(req.body.password){
-        newPassword = bcrypt.hashSync(req.body.password, salt)
-    } else {
-        newPassword = userExist.passwordHash;
-    }
-
-    const type = req.params.type;
-    if (type == 'naari'){
-        const user = await User.findByIdAndUpdate(
-            req.params._id, 
-            {
-                name: req.body.name,
-                email: req.body.email,
-                phone: req.body.phone,
-                passwordHash: bcrypt.hashSync(req.body.password,salt),
-                street: req.body.street,
-                house: req.body.house,
-                city: req.body.city,
-                state: req.body.state,
-                zip: req.body.zip,
-                description: req.body.description,
-                image: req.body.image
-    
-            },
-            {new: true})
-            if (!user){
-                res.status(400).json({success: false, message: "User was not found"});
-            }
-            res.status(200).send(user);
-    }
-    if (type == 'user'){
-        const user = await User.findByIdAndUpdate(
-            req.params._id, 
-            {
-                name: req.body.name,
-                email: req.body.email,
-                category: req.body.category,
-                phone: req.body.phone,
-                passwordHash: bcrypt.hashSync(req.body.password,salt),
-                institution: req.body.institution,
-                street: req.body.street,
-                house: req.body.house,
-                city: req.body.city,
-                state: req.body.state,
-                zip: req.body.zip,
-                description: req.body.description,
-                image: req.body.image
-    
-            },
-            {new: true})
-            if (!user){
-                res.status(400).json({success: false, message: "User was not found"});
-            }
-            res.status(200).send(user);
-    }
 
 })
 
