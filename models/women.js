@@ -34,10 +34,7 @@ const womenSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    country: {
-        type: String,
-        default: ''
-    },
+
     image: {
         type: String,
         default: ''

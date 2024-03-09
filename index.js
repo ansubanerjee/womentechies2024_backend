@@ -4,8 +4,9 @@ const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-
-
+const morgan = require("morgan");
+const authJwt = require("./helpers/jwt");
+const errorHandler = require("./helpers/error-handler");
 
 
 //SCHEMA
@@ -17,11 +18,19 @@ const User = require('./models/user');
 require('dotenv/config');
 app.use(cors());
 const api = process.env.API_URL;
+const womensRouter = require('./routes/womens');
+const usersRouter = require('./routes/users');
 
 //MIDDLEWARE
+app.use(express.json());
+app.use(morgan('tiny'));
+app.use(authJwt());
+app.use(errorHandler);
+app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 
 //ROUTERS
-
+app.use(`${api}/womens`, womensRouter)
+app.use(`${api}/users`, usersRouter)
 
 
 const db_url = process.env.db_url;
