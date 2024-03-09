@@ -10,10 +10,13 @@ const courseSchema = mongoose.Schema({
         required: true
     },
     
-    image: {
+    upload: {
         type: String,
         default:''
     },
+    uploads: [{
+        type: String
+    }],
     content: [{
         type: String,
     }],

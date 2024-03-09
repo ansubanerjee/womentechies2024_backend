@@ -45,7 +45,7 @@ router.get('/:_id', async (req, res)=>{
     res.status(200).send(product);
 })
 
-router.post(`/`,uploadOptions.single('image'), async (req, res) =>{
+router.post(`/`,uploadOptions.single('upload'), async (req, res) =>{
     const file = req.file;
     if(!file){req.status(404).send('No upload in request')}
     const fileName = req.file.filename;
@@ -72,7 +72,7 @@ router.post(`/`,uploadOptions.single('image'), async (req, res) =>{
   })
 
 
-router.put('/:_id',uploadOptions.single('image'), async (req, res)=>{
+router.put('/:_id',uploadOptions.single('upload'), async (req, res)=>{
     if(!mongoose.isValidObjectId(req.params._id)){
         res.status(400).json({success: false, message: "Invalid Product ID"})
     }

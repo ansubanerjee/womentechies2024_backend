@@ -3,35 +3,34 @@ const router =  express.Router();
 const {Course} = require('../models/course');
 const mongoose = require("mongoose");
 const multer = require('multer');
-const { FILE } = require("dns");
+const { Product } = require("../models/product");
 
 const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
-
-}
+    'upload/mov': 'mov',
+    'upload/mp4': 'mp4',
+    'upload/wmv': 'wmv',
+    'upload/png' : 'png',
+    'upload/jpg' : 'jpg',
+    'upload/jpeg' : 'jpeg',
+};
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('Invalid Image type')
-        if(isValid){
-            uploadError = null
-        }
-
-      cb(uploadError, 'public/uploads')
+            const isValid = FILE_TYPE_MAP[file.mimetype]; 
+            let uploadError = new Error('invalid upload type')
+            if(isValid){
+                uploadError = null 
+            }
+        cb(uploadError, 'public/uploads/courses')
     },
-    filename: function (req, file, cb) {
+    filename: function( req, file, cb){
         
-    const filename = file.originalname.split(' ').join('-');
-    const extension = FILE_TYPE_MAP[file.mimetype];
-    cb(null, `${filename}-${Date.now()}.${extension}`)
+        const fileName = file.originalname.replace(' ', '_');
+        const extension = FILE_TYPE_MAP[file.mimetype]; 
+        cb(null, `${fileName}_${Date.now()}.${extension}`)
     }
-  })
-  
-  const uploadOptions = multer({ storage: storage })
-
+})
+var uploadOptions = multer({storage: storage});
 
 
 router.get(`/`, async (req, res) =>{
@@ -50,19 +49,18 @@ router.get('/:_id', async (req, res)=>{
     res.status(200).send(course);
 })
 
-router.post(`/`, uploadOptions.single('image'), async (req, res) =>{
+router.post(`/`, uploadOptions.single('upload'), async (req, res) =>{
 
     const file = req.file;
     if (!file){
         res.status(400).json({success: false, message: "No Imagefile in request"})
     } 
-
     const fileName  = req.file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/courses`;
     const course = new Course({
         name: req.body.name,
         description: req.body.description,
-        image: `${basePath}${fileName}`,
+        upload: `${basePath}${fileName}`,
         price: req.body.price,
         content: req.body.content,
 
@@ -80,7 +78,7 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) =>{
     }
   })
 
-router.put('/:_id', async (req, res)=>{
+router.put('/:_id', uploadOptions.single('upload'), async (req, res)=>{
     if(!mongoose.isValidObjectId(req.params._id)){
         res.status(400).json({success: false, message: "Invalid Course ID"})
     }
@@ -90,12 +88,13 @@ router.put('/:_id', async (req, res)=>{
     }
     const file = req.file;
     let imagePath;
+
     if (file){
         const fileName  = req.file.filename;
-        const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
-        imagePath
+        const basePath = `${req.protocol}://${req.get('host')}/public/upload/courses`;
+        imagePath `${basePath}${fileName}`
     }else{
-        imagePath = Course.image;
+        imagePath = courseCheck.image;
     }
 
     const updatedCourse = await Course.findByIdAndUpdate(
@@ -103,7 +102,7 @@ router.put('/:_id', async (req, res)=>{
         {
             name: req.body.name,
             description: req.body.description,
-            image: `${basePath}${fileName}`,
+            image: imagePath,
             price: req.body.price,
             content: req.body.content,
         }, {new: true})
@@ -137,4 +136,32 @@ router.get('/get/count', async (req, res)=>{
     })
 })
 
+
+router.put('/course-content/:_id', 
+uploadOptions.array('image',100), 
+async (req, res)=>{
+    if (!mongoose.isValidObjectId(req.params.id)){
+        return res.status(400).send('Invalid Course ID')
+    }
+    const files = req.files
+    let imagePaths = [];
+    const basePath = `${req.protocol}://${req.get('host')}/public/upload/courses`;
+
+    if (files){
+        files.map(file =>
+            imagePaths.push(`${basePath}${file.fileName}`)
+            )}
+
+    const course = await Course.findByIdAndUpdate(
+        req.params.id,
+        {
+            upload: uploadPaths
+        }, {new: true}
+    )
+    if (!course){
+        return res.status(500).send('Course cannot be updated')
+    }
+    res.send(course);
+
+})
 module.exports = router;

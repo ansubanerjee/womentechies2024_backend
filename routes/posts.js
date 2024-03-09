@@ -60,7 +60,7 @@ router.get(`/:_id`, async (req, res)=>{
     
 })
 
-router.post('/', uploadOptions.single('image'), async (req, res)=>{
+router.post('/', uploadOptions.single('upload'), async (req, res)=>{
     const file = req.file;
     if(!file){req.status(404).send('No upload in request')}
     const fileName = req.file.filename;
