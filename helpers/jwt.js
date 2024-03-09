@@ -11,8 +11,10 @@ function authJwt(){
         path: [
             `${api}/users/login`,
             `${api}/users/register`,
-            `${api}/women/login`,
-            `${api}/women/register`,
+            `${api}/womens/login`,
+            `${api}/womens/register`,
+            `${api}/womens/`,
+            `${api}/users/`,
         ]
     })
 }

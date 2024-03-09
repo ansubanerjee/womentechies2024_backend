@@ -117,16 +117,17 @@ router.post('/login', async (req, res)=>{
 })
 
 
-
+    
 //Register
 router.post('/register', async (req, res)=>{
+    console.log(req.body)
     const salt = await bcrypt.genSalt();
     const user = new User({
         name: req.body.name,
         category: req.body.category,
         email: req.body.email,
         phone: req.body.phone,
-        passwordHash: bcrypt.hashSync(req.body.password,salt),
+        passwordHash: bcrypt.hashSync(req.body.password, salt),
         institution: req.body.institution,
         city: req.body.city,
         state: req.body.state,
@@ -168,10 +169,10 @@ router.delete('/:_id', async (req,res)=>{
 })
 
 router.put('/:_id', async (req, res)=>{
-    const salt = await bcrypt.genSalt();
     const userExist = await User.findById(req.params.id);
     const fileName  = req.file.filename;
     const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
+    const salt = await bcrypt.genSalt();
     let newPassword
     if(req.body.password){
         newPassword = bcrypt.hashSync(req.body.password, salt)

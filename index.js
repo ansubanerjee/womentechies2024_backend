@@ -11,7 +11,6 @@ const errorHandler = require("./helpers/error-handler");
 
 //SCHEMA
 const Women = require('./models/women');
-const User_category = require('./models/user_category');
 const User = require('./models/user');
 const Product = require('./models/product');
 const Post = require('./models/post');
@@ -37,6 +36,7 @@ app.use(express.json());
 app.use(morgan('tiny'));
 app.use(authJwt());
 app.use(errorHandler);
+app.use(express.json());
 app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 
 //ROUTERS
