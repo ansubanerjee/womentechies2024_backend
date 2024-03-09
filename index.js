@@ -13,6 +13,13 @@ const errorHandler = require("./helpers/error-handler");
 const Women = require('./models/women');
 const User_category = require('./models/user_category');
 const User = require('./models/user');
+const Product = require('./models/product');
+const Post = require('./models/post');
+const Order = require('./models/order');
+const Order_items = require('./models/order-items');
+const Course = require('./models/course');
+const Course_category = require('./models/course_category');
+
 
 //GENERAL
 require('dotenv/config');
