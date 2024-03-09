@@ -22,6 +22,9 @@ const Course = require('./models/course');
 //GENERAL
 require('dotenv/config');
 app.use(cors());
+app.use(express.json());
+
+
 const api = process.env.API_URL;
 const womensRouter = require('./routes/womens');
 const usersRouter = require('./routes/users');
@@ -32,11 +35,9 @@ const ordersRouter = require('./routes/orders');
 
 
 //MIDDLEWARE
-app.use(express.json());
 app.use(morgan('tiny'));
 app.use(authJwt());
 app.use(errorHandler);
-app.use(express.json());
 app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 
 //ROUTERS

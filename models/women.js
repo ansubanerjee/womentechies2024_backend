@@ -42,6 +42,10 @@ const womenSchema = new mongoose.Schema({
     description: {
         type: String,
         default: ''
+    },
+    isAdmin:{
+        type: String,
+        default: ''
     }
 })
 

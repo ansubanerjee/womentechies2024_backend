@@ -6,10 +6,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    category:[{
+    category:{
         type: String,
         required: true
-    }],
+    },
 
     email: {
         type: String,
@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    isAdmin:{
+        type: String,
+        default: false
+    }
 })
 
 

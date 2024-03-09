@@ -3,37 +3,6 @@ const bcrypt = require('bcryptjs')
 const router = express.Router();
 const {User} = require('../models/user');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const { FILE } = require("dns");
-
-
-const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
-
-}
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('Invalid Image type')
-        if(isValid){
-            uploadError = null
-        }
-
-      cb(uploadError, 'public/uploads')
-    },
-    filename: function (req, file, cb) {
-        
-    const filename = file.originalname.split(' ').join('-');
-    const extension = FILE_TYPE_MAP[file.mimetype];
-    cb(null, `${filename}-${Date.now()}.${extension}`)
-    }
-  })
-  
-  const uploadOptions = multer({ storage: storage })
-
-
 
 
 router.get('/', async (req,res)=>{
@@ -62,8 +31,6 @@ router.get(`/:_id`, async (req, res) =>{
 
 router.post('/', async (req, res)=>{
     const salt = await bcrypt.genSalt();
-    const fileName  = req.file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
 
     const user = new User({
         name: req.body.name,
@@ -74,8 +41,8 @@ router.post('/', async (req, res)=>{
         institution: req.body.institution,
         city: req.body.city,
         state: req.body.state,
-        image: `${basePath}${fileName}`,
         isAdmin: req.body.isAdmin,
+        image: req.body.image
     })
     await user.save();
     try{
@@ -117,10 +84,9 @@ router.post('/login', async (req, res)=>{
 })
 
 
-    
+
 //Register
 router.post('/register', async (req, res)=>{
-    console.log(req.body)
     const salt = await bcrypt.genSalt();
     const user = new User({
         name: req.body.name,
@@ -170,8 +136,6 @@ router.delete('/:_id', async (req,res)=>{
 
 router.put('/:_id', async (req, res)=>{
     const userExist = await User.findById(req.params.id);
-    const fileName  = req.file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/upload/`;
     const salt = await bcrypt.genSalt();
     let newPassword
     if(req.body.password){
@@ -190,7 +154,7 @@ router.put('/:_id', async (req, res)=>{
             institution: req.body.institution,
             city: req.body.city,
             state: req.body.state,
-            image: `${basePath}${fileName}`,
+            image: req.body.image
 
         },
         {new: true})
