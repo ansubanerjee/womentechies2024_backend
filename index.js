@@ -1,8 +1,15 @@
 const mongoose = require('mongoose');
 
 
-const db_url = "mongodb+srv://ansubanerjee:5LxgQpR6JlsUYwWw@clusterdefault.gwmc44z.mongodb.net/WomanTechies2024?retryWrites=true&w=majority&appName=clusterdefault";
+const Women = require('./models/women');
+const User_category = require('./models/user_category');
+const User = require('./models/user');
 
+const cors = require('cors');
+require('dotenv/config');
+
+
+const db_url = process.env.db_url;
 const connectionParams = {
     useNewUrlParser : true,
     useUnifiedTopology : true
