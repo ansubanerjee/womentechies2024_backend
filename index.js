@@ -7,7 +7,8 @@ const cors = require('cors');
 const morgan = require("morgan");
 const authJwt = require("./helpers/jwt");
 const errorHandler = require("./helpers/error-handler");
-
+const multer = require('multer');
+const upload = multer({dest: 'uploads/'})
 
 //SCHEMA
 const User = require('./models/user');

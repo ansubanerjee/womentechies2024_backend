@@ -5,6 +5,32 @@ const {User} = require('../models/user');
 const jwt = require('jsonwebtoken');
 
 
+const multer = require('multer');
+const FILE_TYPE_MAP = {
+    'image/png' : 'png',
+    'image/jpg' : 'jpg',
+    'image/jpeg' : 'jpeg',
+
+
+};
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+            const isValid = FILE_TYPE_MAP[file.mimetype]; 
+            let uploadError = new Error('invalid image type')
+            if(isValid){
+                uploadError = null 
+            }
+        cb(uploadError, 'public/uploads/profile_pics')
+    },
+    filename: function( req, file, cb){
+        
+        const fileName = file.originalname.replace(' ', '_');
+        const extension = FILE_TYPE_MAP[file.mimetype]; 
+        cb(null, `${fileName}_${Date.now()}.${extension}`)
+    }
+})
+var uploadOptions = multer({storage: storage});
+
 router.get('/', async (req,res)=>{
     const UserList = await User.find().select('-passwordHash');
     try{
@@ -29,9 +55,13 @@ router.get(`/:_id`, async (req, res) =>{
 
 
 
-router.post('/', async (req, res)=>{
+router.post('/', uploadOptions.single('image'), async (req, res)=>{
     const salt = await bcrypt.genSalt();
 
+    const file = req.file;
+    if(!file){req.status(404).send('No image in request')}
+    const fileName = req.file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/profile_pics`;
     const user = new User({
         name: req.body.name,
         type: req.body.type,
@@ -46,7 +76,7 @@ router.post('/', async (req, res)=>{
         state: req.body.state,
         zip: req.body.zip,
         isAdmin: req.body.isAdmin,
-        image: req.body.image,
+        image: `${basePath}${fileName}`,
         description: req.body.description,
         isAdmin: req.body.isAdmin
     })
@@ -159,8 +189,23 @@ router.delete('/:_id', async (req,res)=>{
     }
 })
 
-router.put('/naari/:_id', async (req, res)=>{
-    const userExist = await User.findById(req.params.id);
+router.put('/:_id', uploadOptions.single('image'), async (req, res)=>{
+    if (!mongoose.isValidObjectId(req.params._id)){
+        return res.status(400).send('Invalid ID')
+    }
+    const userExist = await User.findById(req.params._id);
+    if(!userExist) return res.status(400).send("Invalid User")
+
+    const file = req.file;
+    let imagepath;
+    
+    if(file){
+        const fileName = file.filename;
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/profile_pics`;
+        imagepath =  `${basePath}${fileName}`
+    }else{
+        imagepath = user.image;
+    }
     const salt = await bcrypt.genSalt();
     let newPassword
     if(req.body.password){
@@ -168,7 +213,7 @@ router.put('/naari/:_id', async (req, res)=>{
     } else {
         newPassword = userExist.passwordHash;
     }
-    const user = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
         req.params._id, 
         {
             name: req.body.name,
@@ -179,15 +224,15 @@ router.put('/naari/:_id', async (req, res)=>{
             institution: req.body.institution,
             city: req.body.city,
             state: req.body.state,
-            image: req.body.image
+            image: imagepath 
 
         },
         {new: true})
 
-        if (!user){
+        if (!updatedUser){
             res.status(400).json({success: false, message: "User was not found"});
         }
-        res.status(200).send(user);
+        res.status(200).send(updatedUser);
 
 })
 
