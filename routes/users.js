@@ -34,15 +34,21 @@ router.post('/', async (req, res)=>{
 
     const user = new User({
         name: req.body.name,
+        type: req.body.type,
         category: req.body.category,
         email: req.body.email,
         phone: req.body.phone,
         passwordHash: bcrypt.hashSync(req.body.password,salt),
         institution: req.body.institution,
+        street: req.body.street,
+        house: req.body.house,
         city: req.body.city,
         state: req.body.state,
+        zip: req.body.zip,
         isAdmin: req.body.isAdmin,
-        image: req.body.image
+        image: req.body.image,
+        description: req.body.description,
+        isAdmin: req.body.isAdmin
     })
     await user.save();
     try{
@@ -57,6 +63,7 @@ router.post('/', async (req, res)=>{
 
 
 //Login
+
 router.post('/login', async (req, res)=>{
     const user = await User.findOne({email: req.body.email})
     const secret = process.env.secret;
@@ -85,18 +92,15 @@ router.post('/login', async (req, res)=>{
 
 
 
+
 //Register
-router.post('/register', async (req, res)=>{
+router.post('/naari/register', async (req, res)=>{
     const salt = await bcrypt.genSalt();
     const user = new User({
         name: req.body.name,
-        category: req.body.category,
         email: req.body.email,
         phone: req.body.phone,
         passwordHash: bcrypt.hashSync(req.body.password, salt),
-        institution: req.body.institution,
-        city: req.body.city,
-        state: req.body.state,
         isAdmin: req.body.isAdmin,  
     })
     await user.save();
@@ -108,6 +112,27 @@ router.post('/register', async (req, res)=>{
         res.status(500).json({ error: err, success: false })
     }
 })
+
+
+router.post('/user/register', async (req, res)=>{
+    const salt = await bcrypt.genSalt();
+    const user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+        passwordHash: bcrypt.hashSync(req.body.password, salt),
+        isAdmin: req.body.isAdmin,  
+    })
+    await user.save();
+    try{
+        if(!user){
+        return res.status(400).send({ message: "User could not be created", success: false})
+        }res.status(201).send(user)
+    }catch(err){
+        res.status(500).json({ error: err, success: false })
+    }
+})
+
 
 
 
@@ -134,7 +159,7 @@ router.delete('/:_id', async (req,res)=>{
     }
 })
 
-router.put('/:_id', async (req, res)=>{
+router.put('/naari/:_id', async (req, res)=>{
     const userExist = await User.findById(req.params.id);
     const salt = await bcrypt.genSalt();
     let newPassword
@@ -163,6 +188,69 @@ router.put('/:_id', async (req, res)=>{
             res.status(400).json({success: false, message: "User was not found"});
         }
         res.status(200).send(user);
+
+})
+
+router.put('/:_id', async (req, res)=>{
+    const userExist = await User.findById(req.params.id);
+    const salt = await bcrypt.genSalt();
+    //through ID check type: if type is naari show naari page, else show user
+    let newPassword
+    if(req.body.password){
+        newPassword = bcrypt.hashSync(req.body.password, salt)
+    } else {
+        newPassword = userExist.passwordHash;
+    }
+
+    const type = req.params.type;
+    if (type == 'naari'){
+        const user = await User.findByIdAndUpdate(
+            req.params._id, 
+            {
+                name: req.body.name,
+                email: req.body.email,
+                phone: req.body.phone,
+                passwordHash: bcrypt.hashSync(req.body.password,salt),
+                street: req.body.street,
+                house: req.body.house,
+                city: req.body.city,
+                state: req.body.state,
+                zip: req.body.zip,
+                description: req.body.description,
+                image: req.body.image
+    
+            },
+            {new: true})
+            if (!user){
+                res.status(400).json({success: false, message: "User was not found"});
+            }
+            res.status(200).send(user);
+    }
+    if (type == 'user'){
+        const user = await User.findByIdAndUpdate(
+            req.params._id, 
+            {
+                name: req.body.name,
+                email: req.body.email,
+                category: req.body.category,
+                phone: req.body.phone,
+                passwordHash: bcrypt.hashSync(req.body.password,salt),
+                institution: req.body.institution,
+                street: req.body.street,
+                house: req.body.house,
+                city: req.body.city,
+                state: req.body.state,
+                zip: req.body.zip,
+                description: req.body.description,
+                image: req.body.image
+    
+            },
+            {new: true})
+            if (!user){
+                res.status(400).json({success: false, message: "User was not found"});
+            }
+            res.status(200).send(user);
+    }
 
 })
 

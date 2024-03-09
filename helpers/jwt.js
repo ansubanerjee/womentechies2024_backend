@@ -13,6 +13,9 @@ function authJwt(){
             `${api}/users/register`,
             `${api}/womens/login`,
             `${api}/womens/register`,
+            `${api}/courses/`,
+            `${api}/posts/`,
+            `${api}/products/`,
             
         ]
     })

@@ -6,9 +6,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    type:{
+        type: String,
+        //NAARI OR USER
+    },
     category:{
         type: String,
         required: true
+        //ONLY FOR NON NAARI USERS
     },
 
     email: {
@@ -26,6 +31,16 @@ const userSchema = new mongoose.Schema({
     institution: {
         type: String,
         default: ''
+        //ONLY FOR NON WOMEN USERS 
+    },
+
+    street: {
+        type: String,
+        default: ''
+    },
+    house: {
+        type: String,
+        default: ''
     },
     city: {
         type: String,
@@ -35,7 +50,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    zip: {
+        type: String,
+        default: ''
+    },
     image: {
+        type: String,
+        default: ''
+    },
+    description: {
         type: String,
         default: ''
     },
