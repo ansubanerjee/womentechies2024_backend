@@ -9,7 +9,7 @@ const postSchema = mongoose.Schema({
         type: String, 
         required: true,
     },
-    image: {
+    upload: {
         type: String,
         default: ''
     },
